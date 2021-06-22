@@ -1,0 +1,5 @@
+venv/
+bundle.tar.gz
+.DS_STORE
+.idea/
+*.manifest

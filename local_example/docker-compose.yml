@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  car-store:
+    image: car-store
+    ports:
+      - 8080:8080
+    environment:
+      - OPA_URL=http://opa:8181/v1/data/${POLICY_PATH}
+
+  opa:
+    image: openpolicyagent/opa:latest
+    ports:
+      - 8181:8181
+    command: run --server --set services.s3.url=http://localstack:4566/${BUCKET_NAME} --set bundles.authz.service=s3,bundles.authz.resource=${COMMIT_SHA}.tar.gz
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=us-east-1
+
+  localstack:
+    image: localstack/localstack
+    restart: always
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - BUCKET_NAME=${BUCKET_NAME}
+    ports:
+      - "4566:4566"
+    volumes:
+      - ./create_bucket.sh:/docker-entrypoint-initaws.d/create_bucket.sh
+
