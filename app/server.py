@@ -14,6 +14,7 @@ __version__ = "0.1"
 app = Flask(__name__, static_url_path=None, static_folder=None)
 
 cars = {}
+status = {}
 
 
 @app.route("/", methods=["GET"])
@@ -57,6 +58,19 @@ def delete_car(id):
     car = cars[id]
     del cars[id]
     return jsonify({'result': car})
+
+
+@app.route("/cars/<id>/status", methods=["GET"])
+def car_status_detail(id):
+    if id not in status:
+        abort(404)
+    return jsonify({'result': status[id]})
+
+
+@app.route("/cars/<id>/status", methods=["PUT"])
+def add_car_status(id):
+    status[id] = request.json
+    return jsonify({'result': status[id]})
 
 
 @app.before_request
