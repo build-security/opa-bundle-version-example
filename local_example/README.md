@@ -13,7 +13,7 @@ first of all we have to set up our S3 mock. this commands starts localstack whic
 ```
 to view the logs you can run
 ```
-docker compose logs -t | sort -u -k 3
+make show_logs
 ```
 Once there is a log indicating the bucket is created we can continue to the next step.
 This might take a minute.
