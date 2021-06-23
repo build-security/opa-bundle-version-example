@@ -1,14 +1,19 @@
 #!make
 .PHONY: app bundle test clean
 
+dir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+bundle := bundle.tar.gz
+opa := openpolicyagent/opa:latest
+sha := $(shell git rev-parse HEAD)
+
 app:
-	docker build --tag car-store app/
+	docker build --tag car-store ${dir}/app/
 
 bundle:
-	./build_bundle.sh
+	docker run -v ${dir}/policies:/policies -v ${dir}/:/mnt ${opa} build -r ${sha} -o /mnt/${bundle} /policies
 
 test: bundle
-	docker run -v `pwd`/bundle.tar.gz:/bundle.tar.gz openpolicyagent/opa:latest test -v -b /bundle.tar.gz
+	docker run -v ${dir}/${bundle}:/${bundle} ${opa} test -v -b /${bundle}
 
 clean:
-	rm bundle.tar.gz
+	rm ${dir}/${bundle}
